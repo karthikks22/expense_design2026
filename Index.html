@@ -1,0 +1,885 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>TripGain — Reimburse. Approve. Without friction.</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet" />
+<script src="https://unpkg.com/lucide@latest/dist/umd/lucide.min.js"></script>
+<style>
+  *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+  html{scroll-behavior:smooth;font-size:16px}
+  body{font-family:'Inter',-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;color:#111827;background:#fff;-webkit-font-smoothing:antialiased;line-height:1.5}
+  a{color:inherit;text-decoration:none}
+  img{max-width:100%;display:block}
+  ::selection{background:#F26E21;color:#fff}
+
+  /* tokens */
+  :root{
+    --orange:#F26E21;
+    --ink:#030712;
+    --gray-50:#FAFAF7;
+    --gray-100:#f3f4f6;
+    --gray-200:#e5e7eb;
+    --gray-300:#d1d5db;
+    --gray-400:#9ca3af;
+    --gray-500:#6b7280;
+    --gray-600:#4b5563;
+    --gray-700:#374151;
+    --gray-900:#111827;
+    --gray-950:#030712;
+  }
+
+  /* progress bar */
+  .progress{position:fixed;top:0;left:0;height:3px;background:var(--orange);z-index:60;width:0%;transition:width .1s linear}
+
+  /* floating nav */
+  .topnav{position:fixed;top:16px;left:50%;transform:translateX(-50%);z-index:50;display:none}
+  @media(min-width:768px){.topnav{display:block}}
+  .topnav-inner{display:flex;align-items:center;gap:4px;padding:6px 8px;border-radius:999px;background:rgba(255,255,255,.85);backdrop-filter:blur(20px);border:1px solid var(--gray-200);box-shadow:0 1px 3px rgba(0,0,0,.05)}
+  .brand{display:flex;align-items:center;gap:8px;padding:6px 12px}
+  .brand-dot{width:8px;height:8px;border-radius:999px;background:var(--orange);animation:pulse 2.5s ease-in-out infinite}
+  .brand-name{font-size:13px;font-weight:600;letter-spacing:-.01em}
+  .divider{color:var(--gray-200)}
+  .nav-links{display:flex;align-items:center;gap:2px}
+  .nav-link{padding:6px 10px;border-radius:999px;font-size:12px;color:var(--gray-500);transition:all .25s ease}
+  .nav-link:hover{color:var(--gray-950)}
+  .nav-link.active{background:var(--gray-950);color:#fff}
+  .nav-link.impact{color:var(--orange);font-weight:600}
+  .nav-link.impact:hover{background:rgba(242,110,33,.08)}
+
+  /* hero */
+  .hero{position:relative;min-height:100vh;display:flex;flex-direction:column;background:var(--gray-950);color:#fff;overflow:hidden}
+  .hero-grid{position:absolute;inset:0;opacity:.07;pointer-events:none;background-image:linear-gradient(to right,#fff 1px,transparent 1px),linear-gradient(to bottom,#fff 1px,transparent 1px);background-size:80px 80px}
+  .blob{position:absolute;border-radius:999px;filter:blur(160px);pointer-events:none}
+  .blob-orange{top:25%;right:-128px;width:700px;height:700px;background:rgba(242,110,33,.3)}
+  .blob-purple{bottom:0;left:-128px;width:500px;height:500px;background:rgba(126,34,206,.2)}
+  .meta-strip{position:relative;padding:32px 24px 0;display:flex;justify-content:space-between;font-size:11px;color:var(--gray-400);z-index:10}
+  .meta-strip span{letter-spacing:.22em;text-transform:uppercase}
+  .meta-dot{width:4px;height:4px;border-radius:999px;background:var(--gray-700)}
+  .meta-orange{color:var(--orange)}
+  @media(min-width:768px){.meta-strip{padding:40px 48px 0}}
+  .hero-body{position:relative;flex:1;display:flex;align-items:center;padding:80px 24px;z-index:5}
+  @media(min-width:768px){.hero-body{padding:80px 48px}}
+  .hero-inner{max-width:1280px;animation:fadeUp .9s cubic-bezier(.22,1,.36,1)}
+  .pill{display:inline-flex;align-items:center;gap:8px;padding:6px 12px;border-radius:999px;border:1px solid rgba(255,255,255,.15);background:rgba(255,255,255,.05);backdrop-filter:blur(8px);margin-bottom:40px;transition:transform .3s ease}
+  .pill:hover{transform:scale(1.04)}
+  .pill-icon{width:12px;height:12px;color:var(--orange);animation:sparkle 3.5s ease-in-out infinite}
+  .pill-text{font-size:10px;letter-spacing:.22em;text-transform:uppercase;color:var(--gray-300);font-weight:600}
+  .hero-title{font-size:clamp(4rem,10vw,6rem);line-height:1.10;letter-spacing:-.04em;font-weight:600;color:#fff}
+  .accent{color:var(--orange)}
+  .ital{font-style:italic;font-weight:500;color:var(--gray-400)}
+  .hero-grid-cta{margin-top:56px;display:grid;gap:40px;align-items:end;max-width:1024px}
+  @media(min-width:768px){.hero-grid-cta{grid-template-columns:1fr auto}}
+  .hero-sub{font-size:clamp(1.05rem,1.4vw,1.25rem);line-height:1.6;color:var(--gray-300);max-width:36rem}
+  .cta{display:inline-flex;align-items:center;gap:12px;padding:12px 20px;border-radius:999px;background:var(--orange);color:#fff;font-size:14px;font-weight:600;transition:transform .15s ease,background .2s ease}
+  .cta:hover{background:#ea580c;transform:scale(1.04)}
+  .cta:active{transform:scale(.97)}
+  .cta-arrow{animation:bounce 1.8s ease-in-out infinite}
+  .meta-bottom{position:relative;border-top:1px solid rgba(255,255,255,.1);padding:24px;display:grid;grid-template-columns:repeat(2,1fr);gap:24px;z-index:10}
+  @media(min-width:768px){.meta-bottom{grid-template-columns:repeat(4,1fr);padding:24px 48px}}
+  .meta-k{font-size:10px;letter-spacing:.22em;text-transform:uppercase;color:var(--gray-500);font-weight:600;margin-bottom:6px}
+  .meta-v{font-size:14px;font-weight:500;color:#fff}
+
+  /* main */
+  main{padding:0 24px}
+  @media(min-width:768px){main{padding:0 48px}}
+  .container{max-width:1280px;margin:0 auto}
+  .py-32{padding:128px 0}
+  .space-y-40>*+*{margin-top:160px}
+
+  /* chapter card */
+  .chapter{position:relative;scroll-margin-top:112px}
+  .ghost{position:absolute;top:-40px;left:-8px;font-size:clamp(10rem,18vw,16rem);line-height:1;letter-spacing:-.05em;color:#f3f4f6;user-select:none;pointer-events:none;font-weight:600;z-index:0}
+  @media(min-width:768px){.ghost{left:-24px}}
+  .chapter-inner{position:relative;z-index:1}
+  .eyebrow{display:flex;align-items:center;gap:12px;margin-bottom:24px}
+  .eyebrow-dot{width:8px;height:8px;border-radius:999px;background:var(--orange)}
+  .eyebrow-text{font-size:11px;letter-spacing:.25em;text-transform:uppercase;color:var(--orange);font-weight:600}
+  .chapter-title{font-size:clamp(2.5rem,6vw,4rem);line-height:.98;letter-spacing:-.03em;color:var(--gray-950);max-width:64rem;font-weight:600}
+  .chapter-intro{margin-top:32px;font-size:clamp(1.05rem,1.4vw,1.25rem);line-height:1.65;color:var(--gray-600);}
+
+  /* paragraphs */
+  .para{font-size:1.0625rem;line-height:1.75;color:var(--gray-600);max-width:42rem}
+  .para.full{max-width:none}
+
+  /* sub chapter */
+  .sub{padding-top:0}
+  .sub-meta{display:flex;flex-wrap:wrap;align-items:center;gap:12px;margin-bottom:20px}
+  .sub-num{font-size:10px;letter-spacing:.22em;text-transform:uppercase;color:var(--gray-400);font-weight:600;font-variant-numeric:tabular-nums}
+  .sub-dot{width:4px;height:4px;border-radius:999px;background:var(--gray-300)}
+  .sub-label{font-size:11px;letter-spacing:.22em;text-transform:uppercase;color:var(--gray-950);font-weight:600}
+  .sub-view{padding:4px 10px;border-radius:999px;background:rgba(242,110,33,.08);border:1px solid rgba(242,110,33,.2);font-size:10px;letter-spacing:.05em;text-transform:uppercase;color:var(--orange);font-weight:600}
+  .sub-title{font-size:clamp(1.75rem,3.5vw,2.25rem);line-height:1.1;letter-spacing:-.02em;color:var(--gray-950);font-weight:600}
+  .sub-body{margin-top:24px;display:flex;flex-direction:column;gap:20px}
+
+  /* responsibility chips */
+  .chips{display:flex;flex-wrap:wrap;gap:8px;margin-top:20px}
+  .chip{padding:8px 16px;border-radius:999px;border:1px solid var(--gray-300);font-size:14px;color:var(--gray-700);transition:all .25s ease;cursor:default}
+  .chip:hover{border-color:var(--gray-950);background:var(--gray-950);color:#fff;transform:translateY(-2px) scale(1.06)}
+  .chips-label{font-size:10px;letter-spacing:.22em;text-transform:uppercase;color:var(--gray-400);font-weight:600;margin-bottom:20px}
+
+  /* card grids */
+  .grid-3{display:grid;gap:16px;grid-template-columns:1fr}
+  @media(min-width:640px){.grid-3{grid-template-columns:repeat(3,1fr)}}
+  .grid-2{display:grid;gap:16px;grid-template-columns:1fr}
+  @media(min-width:640px){.grid-2{grid-template-columns:repeat(2,1fr)}}
+  .grid-3l{display:grid;gap:16px;grid-template-columns:1fr}
+  @media(min-width:640px){.grid-3l{grid-template-columns:repeat(2,1fr)}}
+  @media(min-width:1024px){.grid-3l{grid-template-columns:repeat(3,1fr)}}
+
+  .card{position:relative;padding:28px;border-radius:24px;background:var(--gray-50);border:1px solid var(--gray-200);overflow:hidden;transition:transform .35s cubic-bezier(.22,1,.36,1),border-color .25s,box-shadow .25s}
+  .card:hover{transform:translateY(-6px);border-color:var(--gray-950)}
+  .card-white{background:#fff}
+  .card-white:hover{border-color:rgba(242,110,33,.4);box-shadow:0 24px 48px -24px rgba(0,0,0,.12)}
+  .card-corner{position:absolute;top:16px;right:20px;font-size:10px;color:var(--gray-300);font-weight:600;font-variant-numeric:tabular-nums}
+  .card-icon{width:24px;height:24px;color:var(--orange);margin-bottom:24px;transition:transform .35s cubic-bezier(.22,1,.36,1)}
+  .card:hover .card-icon{transform:rotate(-8deg) scale(1.15)}
+  .card-icon-box{width:40px;height:40px;border-radius:12px;background:rgba(242,110,33,.08);display:flex;align-items:center;justify-content:center;transition:all .35s}
+  .card:hover .card-icon-box{background:rgba(242,110,33,.15);transform:rotate(12deg) scale(1.1)}
+  .card-icon-box i{width:16px;height:16px;color:var(--orange)}
+  .card-top{display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:20px}
+  .card-title{font-size:18px;font-weight:600;color:var(--gray-950);margin-bottom:8px}
+  .card-title-sm{font-size:16px;font-weight:600;color:var(--gray-950);margin-bottom:6px}
+  .card-desc{font-size:14px;line-height:1.6;color:var(--gray-600)}
+
+  /* problem quote */
+  .quote{margin-top:56px;font-size:clamp(1rem,3vw,1.25rem);line-height:1.35;letter-spacing:-.01em;color:var(--gray-950);font-weight:400}
+
+  /* approval pipeline */
+  .pipeline{margin-top:40px;padding:32px;border-radius:24px;background:var(--gray-950);color:#fff;position:relative;overflow:hidden}
+  @media(min-width:768px){.pipeline{padding:40px}}
+  .pipeline-blob{position:absolute;top:0;right:0;width:384px;height:384px;background:rgba(242,110,33,.2);filter:blur(120px);pointer-events:none}
+  .pipeline-inner{position:relative}
+  .pipeline-eyebrow{display:flex;align-items:center;gap:12px;margin-bottom:40px}
+  .pipeline-eyebrow i{width:16px;height:16px;color:var(--orange)}
+  .pipeline-eyebrow span{font-size:10px;letter-spacing:.22em;text-transform:uppercase;color:var(--orange);font-weight:600}
+  .pipeline-steps{display:flex;flex-direction:column;gap:12px}
+  @media(min-width:768px){.pipeline-steps{flex-direction:row;align-items:stretch}}
+  .step{flex:1;display:flex;flex-direction:column}
+  .step-head{display:flex;align-items:center;gap:8px;margin-bottom:12px}
+  .step-num{font-size:10px;letter-spacing:.15em;color:var(--gray-500);font-weight:600;font-variant-numeric:tabular-nums}
+  .step-line{height:1px;flex:1;background:rgba(255,255,255,.1)}
+  .step-card{padding:20px;border-radius:16px;background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.1);backdrop-filter:blur(8px);transition:all .35s cubic-bezier(.22,1,.36,1)}
+  .step-card:hover{border-color:rgba(242,110,33,.4);transform:translateY(-4px) scale(1.02)}
+  .step-name{font-size:16px;font-weight:600;color:#fff}
+  .step-detail{font-size:12px;color:var(--gray-400);margin-top:4px}
+  .pipeline-foot{margin-top:32px;font-size:14px;line-height:1.7;color:var(--gray-400);}
+
+  /* findings */
+  .findings{margin-top:64px}
+  .findings ul{list-style:none}
+  .finding{display:grid;grid-template-columns:60px 1fr auto;gap:24px;align-items:center;padding:24px 0;border-top:1px solid var(--gray-200);transition:transform .35s cubic-bezier(.22,1,.36,1)}
+  .finding:last-child{border-bottom:1px solid var(--gray-200)}
+  .finding:hover{transform:translateX(8px)}
+  .finding-num{font-size:16px;color:var(--orange);font-weight:600;font-variant-numeric:tabular-nums}
+  .finding-title{font-size:18px;font-weight:600;color:var(--gray-950);margin-bottom:4px}
+  .finding-desc{font-size:14px;line-height:1.65;color:var(--gray-600)}
+  .finding i{width:20px;height:20px;color:var(--gray-300);transition:all .25s}
+  .finding:hover i{color:var(--orange);transform:rotate(12deg)}
+
+  /* mock dashboard */
+  .mock{margin-top:32px;border-radius:24px;overflow:hidden;border:1px solid var(--gray-200);background:#fff;box-shadow:0 2px 4px rgba(0,0,0,.04),0 24px 48px -24px rgba(0,0,0,.18)}
+  .mock-bar{display:flex;align-items:center;justify-content:space-between;padding:14px 24px;border-bottom:1px solid var(--gray-200);background:var(--gray-50)}
+  .mock-dots{display:flex;align-items:center;gap:10px}
+  .mock-dots-inner{display:flex;gap:6px}
+  .mock-dots-inner span{width:10px;height:10px;border-radius:999px}
+  .mock-dots-inner span:nth-child(1){background:rgba(248,113,113,.7)}
+  .mock-dots-inner span:nth-child(2){background:rgba(251,191,36,.7)}
+  .mock-dots-inner span:nth-child(3){background:rgba(52,211,153,.7)}
+  .mock-url{margin-left:8px;font-size:12px;color:var(--gray-500)}
+  .mock-filter{display:flex;align-items:center;gap:6px;padding:6px 10px;border-radius:6px;border:1px solid var(--gray-200);background:#fff;font-size:12px;color:var(--gray-600)}
+  .mock-filter i{width:14px;height:14px;color:var(--gray-500)}
+  .mock-head{padding:20px 24px;display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid var(--gray-200);gap:12px}
+  .mock-head-l{display:flex;align-items:center;gap:12px}
+  .mock-head-l i{width:20px;height:20px;color:var(--orange)}
+  .mock-head-t{font-size:16px;font-weight:600;color:var(--gray-950)}
+  .mock-head-s{font-size:12px;color:var(--gray-500)}
+  .mock-stats{display:grid;grid-template-columns:repeat(3,1fr);gap:1px;background:var(--gray-200);border-bottom:1px solid var(--gray-200)}
+  .mock-stat{background:#fff;padding:16px 24px}
+  .mock-stat-l{font-size:10px;letter-spacing:.18em;text-transform:uppercase;color:var(--gray-400);font-weight:600}
+  .mock-stat-v{font-size:24px;font-weight:600;margin-top:4px;font-variant-numeric:tabular-nums;display:block}
+  .v-amber{color:#d97706}
+  .v-orange{color:var(--orange)}
+  .v-green{color:#059669}
+  .mock-row{display:grid;grid-template-columns:1fr auto auto;align-items:center;gap:16px;padding:16px 24px;border-bottom:1px solid #f3f4f6;transition:all .25s;cursor:pointer}
+  .mock-row:last-child{border-bottom:none}
+  .mock-row:hover{background:var(--gray-50);transform:translateX(4px)}
+  .mock-row-name{font-size:14px;font-weight:500;color:var(--gray-950)}
+  .mock-row-meta{font-size:11px;color:var(--gray-500);font-variant-numeric:tabular-nums;margin-top:2px}
+  .tag{font-size:11px;padding:2px 8px;border-radius:999px;border:1px solid;font-weight:500}
+  .tag-amber{background:#fffbeb;color:#b45309;border-color:#fde68a}
+  .tag-orange{background:#fff7ed;color:var(--orange);border-color:#fed7aa}
+  .tag-green{background:#ecfdf5;color:#047857;border-color:#a7f3d0}
+  .tag-red{background:#fef2f2;color:#dc2626;border-color:#fecaca}
+  .mock-amt{font-size:14px;font-weight:600;color:var(--gray-950);width:80px;text-align:right;font-variant-numeric:tabular-nums}
+
+  /* flow banner */
+  .flow{margin:24px 0;position:relative}
+  .flow-line{position:absolute;inset:0;display:flex;align-items:center;pointer-events:none}
+  .flow-line span{height:1px;width:100%;background:var(--gray-200)}
+  .flow-pill{position:relative;display:flex;justify-content:center}
+  .flow-pill-inner{display:inline-flex;align-items:center;gap:12px;padding:12px 20px;border-radius:999px;border:1px solid var(--gray-200);background:#fff;box-shadow:0 1px 3px rgba(0,0,0,.05);transition:transform .3s ease}
+  .flow-pill-inner:hover{transform:scale(1.04)}
+  @media(min-width:768px){.flow-pill-inner{gap:20px;padding:12px 32px}}
+  .flow-stage{font-size:10px;letter-spacing:.22em;text-transform:uppercase;color:var(--gray-400);font-weight:600;font-variant-numeric:tabular-nums}
+  .flow-dot{width:4px;height:4px;border-radius:999px;background:var(--gray-300)}
+  .flow-role{font-size:11px;letter-spacing:.22em;text-transform:uppercase;color:var(--orange);font-weight:600}
+  .flow-title{font-size:14px;font-weight:500;color:var(--gray-950);display:none}
+  @media(min-width:768px){.flow-title{display:inline}}
+
+  /* goals */
+  .goal{position:relative;padding:28px;border-radius:24px;background:linear-gradient(to bottom right,var(--gray-50),#fff);border:1px solid var(--gray-200);overflow:hidden;transition:transform .35s,border-color .25s}
+  .goal:hover{transform:translateY(-6px);border-color:var(--orange)}
+  .goal-box{width:40px;height:40px;border-radius:12px;background:#fff;border:1px solid var(--gray-200);display:flex;align-items:center;justify-content:center;margin-bottom:24px;transition:transform .35s}
+  .goal:hover .goal-box{transform:rotate(-10deg) scale(1.12)}
+  .goal-box i{width:16px;height:16px;color:var(--orange)}
+  .goal-text{font-size:15px;line-height:1.5;color:var(--gray-950);font-weight:500}
+
+  /* solution sub note */
+  .note{font-size:14px;line-height:1.7;color:var(--gray-500);font-style:italic;max-width:42rem}
+
+  /* impact */
+  .impact{position:relative;background:var(--gray-950);color:#fff;overflow:hidden;scroll-margin-top:112px}
+  .impact-blob-1{position:absolute;top:-128px;right:-128px;width:600px;height:600px;border-radius:999px;background:rgba(242,110,33,.25);filter:blur(160px);pointer-events:none}
+  .impact-blob-2{position:absolute;bottom:-128px;left:-128px;width:500px;height:500px;border-radius:999px;background:rgba(126,34,206,.15);filter:blur(160px);pointer-events:none}
+  .impact-inner{position:relative;padding:128px 24px}
+  @media(min-width:768px){.impact-inner{padding:128px 48px}}
+  .impact-title{font-size:clamp(2.5rem,7vw,5rem);line-height:.98;letter-spacing:-.03em;color:#fff;max-width:80rem;font-weight:600;margin-top:0}
+  .impact-sub{margin-top:32px;font-size:18px;line-height:1.65;color:var(--gray-400);max-width:42rem}
+  .impact-grid{margin-top:80px;padding-top:48px;border-top:1px solid rgba(255,255,255,.1);display:grid;gap:48px 64px;grid-template-columns:1fr}
+  @media(min-width:768px){.impact-grid{grid-template-columns:1fr 1fr}}
+  .impact-item{display:flex;gap:20px;transition:transform .35s cubic-bezier(.22,1,.36,1)}
+  .impact-item:hover{transform:translateX(6px)}
+  .impact-side{flex-shrink:0}
+  .impact-num{font-size:10px;letter-spacing:.22em;color:var(--gray-500);font-weight:600;margin-bottom:12px;font-variant-numeric:tabular-nums}
+  .impact-icon{width:48px;height:48px;border-radius:16px;background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.1);display:flex;align-items:center;justify-content:center;transition:all .35s}
+  .impact-item:hover .impact-icon{transform:rotate(8deg) scale(1.1);background:rgba(242,110,33,.15)}
+  .impact-icon i{width:20px;height:20px;color:var(--orange)}
+  .impact-h{font-size:20px;font-weight:600;color:#fff;margin-bottom:8px}
+  .impact-d{font-size:14px;line-height:1.7;color:var(--gray-400);max-width:28rem}
+
+  /* learnings */
+  .learn{padding:32px;border-radius:24px;background:var(--gray-50);border:1px solid var(--gray-200);position:relative;transition:all .35s}
+  .learn:hover{background:#fff;box-shadow:0 24px 48px -24px rgba(0,0,0,.12);transform:translateY(-6px)}
+  .learn-corner{position:absolute;top:20px;right:24px;font-size:10px;color:var(--gray-300);font-weight:600;font-variant-numeric:tabular-nums}
+  .learn-box{width:44px;height:44px;border-radius:16px;background:#fff;border:1px solid var(--gray-200);display:flex;align-items:center;justify-content:center;margin-bottom:20px;transition:transform .35s}
+  .learn:hover .learn-box{transform:rotate(-10deg) scale(1.12)}
+  .learn-box i{width:20px;height:20px;color:var(--orange)}
+
+  /* footer */
+  footer{position:relative;background:var(--gray-950);color:#fff;overflow:hidden}
+  .footer-blob{position:absolute;top:0;left:50%;transform:translateX(-50%);width:800px;height:400px;border-radius:999px;background:rgba(242,110,33,.2);filter:blur(160px);pointer-events:none}
+  .footer-inner{position:relative;padding:128px 24px}
+  @media(min-width:768px){.footer-inner{padding:128px 48px}}
+  .footer-end{font-size:10px;letter-spacing:.25em;text-transform:uppercase;color:var(--gray-500);font-weight:600;margin-bottom:32px}
+  .footer-title{font-size:clamp(3rem,8vw,6rem);line-height:.95;letter-spacing:-.04em;color:#fff;max-width:80rem;font-weight:600}
+  .footer-meta{margin-top:64px;padding-top:40px;border-top:1px solid rgba(255,255,255,.1);display:grid;gap:40px;align-items:end;grid-template-columns:1fr}
+  @media(min-width:768px){.footer-meta{grid-template-columns:1fr 1fr}}
+  .footer-text{font-size:18px;line-height:1.65;color:var(--gray-400);max-width:28rem}
+  .footer-right{display:flex;align-items:center;gap:12px;font-size:14px;color:var(--gray-400)}
+  @media(min-width:768px){.footer-right{justify-content:flex-end}}
+  .footer-brand{display:flex;align-items:center;gap:8px}
+  .footer-brand span:last-child{color:#fff;font-weight:600}
+  .footer-sep{color:var(--gray-700)}
+
+  /* reveal animations */
+  .reveal{opacity:0;transform:translateY(30px);transition:opacity .7s cubic-bezier(.22,1,.36,1),transform .7s cubic-bezier(.22,1,.36,1)}
+  .reveal.in{opacity:1;transform:translateY(0)}
+  .stagger>*{opacity:0;transform:translateY(24px);transition:opacity .55s cubic-bezier(.22,1,.36,1),transform .55s cubic-bezier(.22,1,.36,1)}
+  .stagger.in>*{opacity:1;transform:translateY(0)}
+  .stagger.in>*:nth-child(1){transition-delay:.05s}
+  .stagger.in>*:nth-child(2){transition-delay:.13s}
+  .stagger.in>*:nth-child(3){transition-delay:.21s}
+  .stagger.in>*:nth-child(4){transition-delay:.29s}
+  .stagger.in>*:nth-child(5){transition-delay:.37s}
+  .stagger.in>*:nth-child(6){transition-delay:.45s}
+  .stagger.in>*:nth-child(7){transition-delay:.53s}
+
+  @keyframes fadeUp{from{opacity:0;transform:translateY(30px)}to{opacity:1;transform:translateY(0)}}
+  @keyframes pulse{0%,100%{transform:scale(1);opacity:1}50%{transform:scale(1.4);opacity:.7}}
+  @keyframes sparkle{0%,100%{transform:rotate(0) scale(1)}33%{transform:rotate(15deg) scale(1.2)}66%{transform:rotate(-10deg) scale(1.1)}}
+  @keyframes bounce{0%,100%{transform:translateY(0)}50%{transform:translateY(4px)}}
+
+  *,
+*::after,
+*::before {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+.overview-layout{
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    gap:80px;
+    padding:20px;
+}
+
+.overview-content{
+    flex:1;
+}
+
+.overview-image{
+    flex:1;
+}
+
+.compare{
+    width:100%;
+}
+
+.slider-image{
+    width:100%;
+    display:block;
+}
+
+.text-group{
+    margin-top:48px;
+    display:flex;
+    flex-direction:column;
+    gap:32px;
+}
+iframe {
+  aspect-ratio: 16/9;
+}
+
+.video-container {
+  margin: 2rem;
+  max-height: 300px;
+}
+
+img {
+  display: block;
+  max-width: 100%;
+}
+
+main {
+  display: grid;
+  place-items: center;
+  min-height: 100vh;
+}
+
+.compare {
+  display: grid;
+  place-content: center;
+  position: relative;
+  overflow: hidden;
+  border-radius: 1rem;
+  --position: 50%;
+}
+
+.image-container {
+  max-width: 800px;
+  max-height: 90vh;
+  aspect-ratio: 1/1;
+}
+
+.slider-image {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: left;
+}
+
+.image-before {
+  position: absolute;
+  inset: 0;
+  width: var(--position);
+  filter: grayscale(100%)
+}
+
+.slider {
+  position: absolute;
+  inset: 0;
+  cursor: pointer;
+  opacity: 0;
+  /* for Firefox */
+  width: 100%;
+  height: 100%;
+}
+
+.slider:focus-visible ~ .slider-button {
+  outline: 5px solid black;
+  outline-offset: 3px;
+}
+
+.slider-line {
+  position: absolute;
+  inset: 0;
+  width: .2rem;
+  height: 100%;
+  background-color: #fff;
+  /* z-index: 10; */
+  left: var(--position);
+  transform: translateX(-50%);
+  pointer-events: none;
+}
+
+.slider-button {
+  position: absolute;
+  background-color: #fff;
+  color: black;
+  padding: .5rem;
+  border-radius: 100vw;
+  display: grid;
+  place-items: center;
+  top: 50%;
+  left: var(--position);
+  transform: translate(-50%, -50%);
+  pointer-events: none;
+  /* z-index: 100; */
+  box-shadow: 1px 1px 1px hsl(0, 50%, 2%, .5);
+}
+</style>
+</head>
+<body>
+
+<div class="progress" id="progress"></div>
+
+<header class="topnav">
+  <div class="topnav-inner">
+    <div class="brand"><span class="brand-dot"></span><span class="brand-name">TripGain</span></div>
+    <span class="divider">|</span>
+    <nav class="nav-links" id="nav">
+      <a href="#overview" class="nav-link" data-target="overview">Overview</a>
+      <a href="#role" class="nav-link" data-target="role">Role</a>
+      <a href="#workflow" class="nav-link" data-target="workflow">Workflow</a>
+      <a href="#problem" class="nav-link" data-target="problem">Problem</a>
+      <a href="#research" class="nav-link" data-target="research">Research</a>
+      <a href="#goals" class="nav-link" data-target="goals">Goals</a>
+      <a href="#solution" class="nav-link" data-target="solution">Solution</a>
+      <span class="divider" style="margin:0 4px">|</span>
+      <a href="#impact" class="nav-link impact">Impact</a>
+    </nav>
+  </div>
+</header>
+
+<!-- HERO -->
+<section class="hero">
+  <div class="hero-grid"></div>
+  <div class="blob blob-orange"></div>
+  <div class="blob blob-purple"></div>
+
+  <div class="meta-strip">
+    <div style="display:flex;align-items:center;gap:12px"><span>2026</span><span class="meta-dot"></span><span>Case Study 01 / 01</span></div>
+    <div style="display:none;align-items:center;gap:12px" class="meta-strip-r"><span>~ 8 min read</span><span class="meta-dot"></span><span class="meta-orange">Live in production</span></div>
+  </div>
+
+  <div class="hero-body">
+    <div class="hero-inner">
+      <div class="pill"><i class="pill-icon" data-lucide="sparkles"></i><span class="pill-text">TripGain · Enterprise T&amp;E</span></div>
+      <h2 class="hero-title">Designing a more transparent and efficient enterprise reimbursement workflow.</h2>
+      <div class="hero-grid-cta">
+        <p class="hero-sub">Redesigning TripGain's expense submission experience to reduce operational friction and create a more connected reimbursement workflow across employees, managers, and finance teams.</p>
+        <a href="#overview" class="cta">Start reading<i class="cta-arrow" data-lucide="arrow-down" style="width:16px;height:16px"></i></a>
+      </div>
+    </div>
+  </div>
+
+  <div class="meta-bottom">
+    <div><div class="meta-k">Role</div><div class="meta-v">Senior Product Designer</div></div>
+    <div><div class="meta-k">Timeline</div><div class="meta-v">10 Weeks</div></div>
+    <div><div class="meta-k">Scope</div><div class="meta-v">4 user roles · 8 surfaces</div></div>
+    <div><div class="meta-k">Scale</div><div class="meta-v">1,000+ employees</div></div>
+  </div>
+</section>
+
+<main>
+  <div class="container py-32 space-y-40">
+
+    <!-- 01 OVERVIEW -->
+    <section id="overview" class="chapter reveal">
+
+  <div class="overview-layout">
+
+    <!-- LEFT CONTENT -->
+    <div class="overview-content">
+
+      <div class="ghost">01</div>
+
+      <div class="chapter-inner">
+        <div class="eyebrow">
+          <span class="eyebrow-dot"></span>
+          <span class="eyebrow-text">Chapter 01 — Context</span>
+        </div>
+
+        <h2 class="chapter-title">
+          Why this <span class="accent">redesign</span> happened.
+        </h2>
+
+        <p class="chapter-intro">
+          TripGain is an enterprise travel and expense management platform
+          used by organizations to manage travel bookings, reimbursements,
+          employee claims, approvals, and finance operations.
+        </p>
+
+        <div class="text-group">
+          <p class="para">
+            As part of TripGain's larger product revamp, the expense submission workflow was identified as one of the most operationally complex experiences within the platform.
+          </p>
+
+          <p class="para">
+            The redesign focused on improving workflow clarity, reducing operational friction, and creating a more connected reimbursement experience.
+          </p>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- RIGHT IMAGE -->
+    <div class="overview-image">
+
+      <div class="compare">
+        <div class="image-container">
+
+          <img
+            class="image-before slider-image"
+            src="./img-2.svg"
+            alt=""
+          />
+
+          <img
+            class="image-after slider-image"
+            src="./img-1.svg"
+            alt=""
+          />
+
+        </div>
+
+        <input
+          type="range"
+          min="0"
+          max="100"
+          value="50"
+          class="slider"
+        />
+
+        <div class="slider-line"></div>
+
+        <div class="slider-button">
+          <!-- SVG -->
+        </div>
+
+      </div>
+
+    </div>
+
+  </div>
+
+</section>
+
+    <!-- 02 ROLE -->
+    <section id="role" class="chapter reveal">
+      <div class="ghost">02</div>
+      <div class="chapter-inner">
+        <div class="eyebrow"><span class="eyebrow-dot"></span><span class="eyebrow-text">Chapter 02 — Ownership</span></div>
+        <h2 class="chapter-title">Leading the design,<br><span class="accent">end&nbsp;to&nbsp;end</span>.</h2>
+        <p class="chapter-intro">As the lead designer, I owned the end-to-end redesign of the expense submission experience, collaborating closely with product managers, developers, finance teams, and support stakeholders.</p>
+        <div class="chips-label" style="margin-top:32px">Responsibilities</div>
+        <div class="chips stagger">
+          <span class="chip">UX Research</span><span class="chip">Workflow Redesign</span><span class="chip">Information Architecture</span><span class="chip">Interaction Design</span><span class="chip">Product Thinking</span><span class="chip">Developer Collaboration</span><span class="chip">Design System Alignment</span>
+        </div>
+      </div>
+    </section>
+
+    <!-- 03 WORKFLOW -->
+    <section id="workflow" class="chapter reveal">
+      <div class="ghost">03</div>
+      <div class="chapter-inner">
+        <div class="eyebrow"><span class="eyebrow-dot"></span><span class="eyebrow-text">Chapter 03 — Discovery</span></div>
+        <h2 class="chapter-title">Mapping the<br>reimbursement <span class="accent">journey</span>.</h2>
+        <p class="chapter-intro">TripGain supports three distinct types of expense reports, each with unique submission and approval requirements.</p>
+
+        <div class="grid-3 stagger" style="margin-top:64px">
+          <div class="card"><span class="card-corner">01</span><i class="card-icon" data-lucide="plane"></i><div class="card-title">Travel Related</div><div class="card-desc">Connected to approved business trips</div></div>
+          <div class="card"><span class="card-corner">02</span><i class="card-icon" data-lucide="file-text"></i><div class="card-title">Non-Travel</div><div class="card-desc">Manually created expense reports</div></div>
+        </div>
+
+        <div class="pipeline">
+          <div class="pipeline-blob"></div>
+          <div class="pipeline-inner">
+            <div class="pipeline-eyebrow"><i data-lucide="workflow"></i><span>The Approval Pipeline</span></div>
+            <div class="pipeline-steps stagger">
+              <div class="step"><div class="step-head"><span class="step-num">STEP 01</span><span class="step-line"></span></div><div class="step-card"><div class="step-name">Employee</div><div class="step-detail">Submission</div></div></div>
+              <div class="step"><div class="step-head"><span class="step-num">STEP 02</span><span class="step-line"></span></div><div class="step-card"><div class="step-name">Manager</div><div class="step-detail">Approval</div></div></div>
+              <div class="step"><div class="step-head"><span class="step-num">STEP 03</span><span class="step-line"></span></div><div class="step-card"><div class="step-name">Finance Mgr</div><div class="step-detail">Verification</div></div></div>
+              <div class="step"><div class="step-head"><span class="step-num">STEP 04</span><span class="step-line"></span></div><div class="step-card"><div class="step-name">Finance Admin</div><div class="step-detail">Reimbursement</div></div></div>
+            </div>
+            <p class="pipeline-foot">Multiple stakeholders and approval stages mean visibility and communication are critical throughout the experience.</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 04 PROBLEM -->
+    <section id="problem" class="chapter reveal">
+      <div class="ghost">04</div>
+      <div class="chapter-inner">
+        <div class="eyebrow"><span class="eyebrow-dot"></span><span class="eyebrow-text">Chapter 04 — Challenge</span></div>
+        <h2 class="chapter-title">Where the <span class="accent">friction</span> lived.</h2>
+        <blockquote class="quote">The existing workflow created operational friction across reporting, approvals, and reimbursements — users struggled with <span class="accent">visibility</span>, <span class="accent">communication</span>, repetitive actions, and policy understanding.</blockquote>
+        <div class="grid-3l stagger" style="margin-top:56px">
+          <div class="card card-white"><div class="card-top"><div class="card-icon-box"><i data-lucide="clock"></i></div><span class="card-corner" style="position:static">P·01</span></div><div class="card-title-sm">Time-consuming entry</div><div class="card-desc">Employees added expenses one-by-one, making submissions slow.</div></div>
+          <div class="card card-white"><div class="card-top"><div class="card-icon-box"><i data-lucide="target"></i></div><span class="card-corner" style="position:static">P·02</span></div><div class="card-title-sm">Hard to manage reports</div><div class="card-desc">The dashboard lacked hierarchy and filtering for statuses.</div></div>
+          <div class="card card-white"><div class="card-top"><div class="card-icon-box"><i data-lucide="message-square"></i></div><span class="card-corner" style="position:static">P·03</span></div><div class="card-title-sm">Fragmented comms</div><div class="card-desc">Users depended on external tools to clarify approvals.</div></div>
+          <div class="card card-white"><div class="card-top"><div class="card-icon-box"><i data-lucide="eye"></i></div><span class="card-corner" style="position:static">P·04</span></div><div class="card-title-sm">Limited visibility</div><div class="card-desc">Limited insight into approval stages created delays.</div></div>
+          <div class="card card-white"><div class="card-top"><div class="card-icon-box"><i data-lucide="alert-circle"></i></div><span class="card-corner" style="position:static">P·05</span></div><div class="card-title-sm">Unclear violations</div><div class="card-desc">Warnings appeared late, making users feel blocked.</div></div>
+          <div class="card card-white"><div class="card-top"><div class="card-icon-box"><i data-lucide="calendar"></i></div><span class="card-corner" style="position:static">P·06</span></div><div class="card-title-sm">Edge-case blindspots</div><div class="card-desc">Weekend and policy-sensitive expenses lacked context.</div></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 05 RESEARCH -->
+    <section id="research" class="chapter reveal">
+      <div class="ghost">05</div>
+      <div class="chapter-inner">
+        <div class="eyebrow"><span class="eyebrow-dot"></span><span class="eyebrow-text">Chapter 05 — Approach</span></div>
+        <h2 class="chapter-title">Listening before<br><span class="accent">designing</span>.</h2>
+        <p class="chapter-intro">The research focused on identifying friction across expense submission, approvals, reimbursements, and report management workflows.</p>
+
+        <div style="margin-top:64px">
+          <div class="chips-label">Methods</div>
+          <div class="grid-3 stagger">
+            <div class="card" style="background:#fff;border-color:var(--gray-200)"><i class="card-icon" data-lucide="user-search" style="margin-bottom:16px;width:20px;height:20px"></i><div class="card-title-sm">User Interviews</div><div class="card-desc">Spoke with employees, managers, and finance teams about submission confidence and tracking.</div></div>
+            <div class="card" style="background:#fff;border-color:var(--gray-200)"><i class="card-icon" data-lucide="life-buoy" style="margin-bottom:16px;width:20px;height:20px"></i><div class="card-title-sm">Support Tickets</div><div class="card-desc">Reviewed recurring tickets covering policy confusion, approval delays, and receipt issues.</div></div>
+            <div class="card" style="background:#fff;border-color:var(--gray-200)"><i class="card-icon" data-lucide="workflow" style="margin-bottom:16px;width:20px;height:20px"></i><div class="card-title-sm">Workflow Audit</div><div class="card-desc">Mapped the journey from creation through finance verification to reimbursement.</div></div>
+          </div>
+        </div>
+
+        <div class="findings">
+          <div class="chips-label">Key Findings</div>
+          <ul class="stagger">
+            <li class="finding"><span class="finding-num">F·01</span><div><div class="finding-title">Users prioritized approval confidence</div><div class="finding-desc">Employees wanted assurance reports would be approved without rework.</div></div><i data-lucide="arrow-up-right"></i></li>
+            <li class="finding"><span class="finding-num">F·02</span><div><div class="finding-title">Repetitive workflows increased friction</div><div class="finding-desc">Manual entry and inefficient handling slowed recurring submissions.</div></div><i data-lucide="arrow-up-right"></i></li>
+            <li class="finding"><span class="finding-num">F·03</span><div><div class="finding-title">Communication gaps delayed workflows</div><div class="finding-desc">Users relied on external tools to resolve approval queries.</div></div><i data-lucide="arrow-up-right"></i></li>
+            <li class="finding"><span class="finding-num">F·04</span><div><div class="finding-title">Limited visibility reduced trust</div><div class="finding-desc">Users struggled to track report status and pending actions.</div></div><i data-lucide="arrow-up-right"></i></li>
+            <li class="finding"><span class="finding-num">F·05</span><div><div class="finding-title">Policy feedback lacked clarity</div><div class="finding-desc">Warnings appeared late with limited guidance, creating confusion.</div></div><i data-lucide="arrow-up-right"></i></li>
+          </ul>
+        </div>
+      </div>
+    </section>
+
+    <!-- 06 GOALS -->
+    <section id="goals" class="chapter reveal">
+      <div class="ghost">06</div>
+      <div class="chapter-inner">
+        <div class="eyebrow"><span class="eyebrow-dot"></span><span class="eyebrow-text">Chapter 06 — Direction</span></div>
+        <h2 class="chapter-title">What we set out<br>to <span class="accent">achieve</span>.</h2>
+        <p class="chapter-intro">The redesign focused on improving workflow clarity, operational efficiency, and reimbursement visibility across the expense submission journey.</p>
+        <div class="grid-3l stagger" style="margin-top:64px">
+          <div class="goal"><span class="card-corner">G·01</span><div class="goal-box"><i data-lucide="zap"></i></div><p class="goal-text">Simplify recurring expense submission workflows</p></div>
+          <div class="goal"><span class="card-corner">G·02</span><div class="goal-box"><i data-lucide="eye"></i></div><p class="goal-text">Improve report visibility and reimbursement tracking</p></div>
+          <div class="goal"><span class="card-corner">G·03</span><div class="goal-box"><i data-lucide="layers"></i></div><p class="goal-text">Reduce repetitive manual effort during expense creation</p></div>
+          <div class="goal"><span class="card-corner">G·04</span><div class="goal-box"><i data-lucide="messages-square"></i></div><p class="goal-text">Improve communication across employees, managers, and finance</p></div>
+          <div class="goal"><span class="card-corner">G·05</span><div class="goal-box"><i data-lucide="shield-check"></i></div><p class="goal-text">Provide clearer policy validation and workflow guidance</p></div>
+          <div class="goal"><span class="card-corner">G·06</span><div class="goal-box"><i data-lucide="compass"></i></div><p class="goal-text">Create a more transparent and manageable experience</p></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 07 SOLUTION -->
+    <section id="solution" class="chapter reveal">
+      <div class="ghost">07</div>
+      <div class="chapter-inner">
+        <div class="eyebrow"><span class="eyebrow-dot"></span><span class="eyebrow-text">Chapter 07 — Outcome</span></div>
+        <p class="chapter-intro">A redesigned reimbursement experience that brings clarity, structure, and efficiency to every stage of the expense workflow.</p>
+
+        <div style="margin-top:80px;display:flex;flex-direction:column;gap:24px">
+
+          <div class="sub">
+            <div class="sub-meta"><span class="sub-num">7.1</span><span class="sub-dot"></span><span class="sub-label">Expense Report List</span><span class="sub-view">Employee View</span></div>
+            <h3 class="sub-title">A clearer dashboard for managing and tracking reports</h3>
+            <div class="sub-body">
+              <p class="para full">The redesigned expense report dashboard improves report visibility, reimbursement tracking, and overall workflow management through a cleaner and more structured experience. The new design introduced improved dashboard hierarchy, advanced filtering, clearer approval and reimbursement status indicators, faster report search, simplified navigation, and better organization of travel and non-travel reports.</p>
+              <p class="para full">These improvements reduced visual clutter and made recurring expense management workflows easier to scan, track, and manage efficiently.</p>
+              </div>
+              <img src="image-1.svg" style="width:100%; padding-top:40px;">
+          </div>
+
+          <div class="sub">
+            <div class="sub-meta"><span class="sub-num">7.2</span><span class="sub-dot"></span><span class="sub-label">Expense Report Detail</span><span class="sub-view">Employee View</span></div>
+            <h3 class="sub-title">A connected approval journey with built-in collaboration</h3>
+            <div class="sub-body">
+              <p class="para full">The expense report workflow was redesigned to improve communication, workflow visibility, and reimbursement tracking throughout the approval journey. The redesigned experience introduced in-report messaging and collaboration, activity logs for approval visibility, clearer expense hierarchy and tracking, contextual violation and weekend indicators, and simplified report actions and workflow management.</p>
+              <p class="para full">These improvements helped create a more transparent and connected reimbursement experience for employees, managers, and finance teams while reducing workflow friction during approvals and reimbursements.</p>
+            </div>
+            <img src="image-2.svg" style="width:100%; padding-top:40px;">
+          </div>
+
+          <div class="sub">
+            <div class="sub-meta"><span class="sub-num">7.3</span><span class="sub-dot"></span><span class="sub-label">Expense Creation</span><span class="sub-view">Employee View</span></div>
+            <h3 class="sub-title">Faster submissions across expense, mileage, and bulk flows</h3>
+            <div class="sub-body">
+              <p class="para full">The expense creation workflow was redesigned to reduce manual effort and improve submission efficiency across expense, mileage, and bulk expense flows. The redesigned experience introduced OCR-supported receipt upload, structured expense forms, simplified mileage entry, bulk expense handling, and clearer form hierarchy to make recurring submissions faster and easier to manage.</p>
+              <p class="para full">The redesigned experience streamlined how users create, manage, and submit different types of expenses by reducing repetitive manual entry, simplifying mileage tracking, improving receipt handling, and enabling faster bulk expense submissions within a single workflow.</p>
+            </div>
+            <img src="image-3.svg" style="width:100%; padding-top:40px;">
+          </div>
+
+          <div class="sub">
+            <div class="sub-meta"><span class="sub-num">7.5</span><span class="sub-dot"></span><span class="sub-label">Report Status Experience</span><span class="sub-view">Workflow States</span></div>
+            <h3 class="sub-title">Transparent status across submission, approval, and reimbursement</h3>
+            <div class="sub-body">
+              <p class="para full">The expense report workflow was redesigned to provide clearer visibility across submitted, approved, and reimbursed states throughout the reimbursement journey. The redesigned experience introduced contextual workflow banners, improved reimbursement visibility, clearer approval states, and better report tracking to help users easily understand the current status of their expense reports.</p>
+              <p class="para full">The redesigned experience helped users track report progress more transparently by improving status communication, reimbursement visibility, approval awareness, and workflow clarity across different stages of the reimbursement process.</p>
+            </div>
+            <img src="image-4.svg" style="width:100%; padding-top:40px;">
+          </div>
+
+          <div class="flow"><div class="flow-line"><span></span></div><div class="flow-pill"><div class="flow-pill-inner"><span class="flow-stage">Chapter 7 cont.</span><span class="flow-dot"></span><span class="flow-role">Manager Flow</span><span class="flow-dot"></span><span class="flow-title">Approving expenses</span></div></div></div>
+
+          <div class="sub">
+            <div class="sub-meta"><span class="sub-num">7.6</span><span class="sub-dot"></span><span class="sub-label">Manager Approval Experience</span><span class="sub-view">Manager View</span></div>
+            <h3 class="sub-title">Faster, more confident approval decisions</h3>
+            <div class="sub-body">
+              <p class="para full">The manager approval workflow was redesigned to improve approval visibility, expense validation, and decision-making efficiency throughout the reimbursement process. The redesigned experience introduced structured approval requests, clearer expense hierarchy, contextual policy indicators, reimbursement visibility, and simplified approval actions to help managers review and process reports more efficiently.</p>
+              <p class="para full">The redesigned experience helped managers review, validate, and process expense reports more effectively by improving workflow clarity, simplifying approval actions, and providing better visibility into violations, reimbursement amounts, and employee-submitted expenses.</p>
+            </div>
+            <img src="image-4-1.svg" style="width:100%; padding-top:40px;">
+          </div>
+
+          <div class="flow"><div class="flow-line"><span></span></div><div class="flow-pill"><div class="flow-pill-inner"><span class="flow-stage">Chapter 7 cont.</span><span class="flow-dot"></span><span class="flow-role">Finance Manager Flow</span><span class="flow-dot"></span><span class="flow-title">Post-approval verification</span></div></div></div>
+
+          <div class="sub">
+            <div class="sub-meta"><span class="sub-num">7.7</span><span class="sub-dot"></span><span class="sub-label">Finance Verification Workflow</span><span class="sub-view">Finance Manager</span></div>
+            <h3 class="sub-title">A streamlined verification flow for finance teams</h3>
+            <div class="sub-body">
+              <p class="note">Once a manager approves the report, it moves to the Finance Manager for verification.</p>
+              <p class="para full">Redesigned the Finance Manager expense verification flow to simplify how finance teams review and process employee expense reports. The new flow provides clear visibility into eligible reimbursement amounts, policy violations, and expense details in a single streamlined interface. Finance managers can quickly verify expenses, send reports back to employees for revision, or approve them for the next stage. Once verified, reports are seamlessly transferred to the Finance Admin for reimbursement processing, reducing manual effort and improving operational efficiency.</p>
+            </div>
+            <img src="image-5.svg" style="width:100%; padding-top:40px;">
+          </div>
+
+          <div class="flow"><div class="flow-line"><span></span></div><div class="flow-pill"><div class="flow-pill-inner"><span class="flow-stage">Chapter 7 cont.</span><span class="flow-dot"></span><span class="flow-role">Finance Admin Flow</span><span class="flow-dot"></span><span class="flow-title">Reimbursement processing</span></div></div></div>
+
+          <div class="sub">
+            <div class="sub-meta"><span class="sub-num">7.8</span><span class="sub-dot"></span><span class="sub-label">Reimbursement Workflow</span><span class="sub-view">Finance Admin</span></div>
+            <h3 class="sub-title">Closing the loop with faster reimbursement processing</h3>
+            <div class="sub-body">
+              <p class="note">Once the Finance Manager verifies a report, it arrives in the Finance Admin's queue for reimbursement.</p>
+              <p class="para full">Redesigned the Finance Admin reimbursement flow to streamline the final stage of expense processing. Once expense reports are verified by the Finance Manager, they are moved to the Reimburse Requests queue where Finance Admins can review approved amounts, add bank and UTR details, and complete the reimbursement process. The redesigned flow improves status visibility, reduces manual effort, and enables faster reimbursement processing.</p>
+            </div>
+            <img src="image-6.svg" style="width:100%; padding-top:40px;">
+          </div>
+
+        </div>
+      </div>
+    </section>
+
+  </div>
+</main>
+
+<!-- 08 IMPACT -->
+<section id="impact" class="impact reveal">
+  <div class="impact-blob-1"></div>
+  <div class="impact-blob-2"></div>
+  <div class="impact-inner">
+    <div class="container">
+      <div class="eyebrow"><span class="eyebrow-dot"></span><span class="eyebrow-text">Chapter 08 — Results</span></div>
+      <h2 class="impact-title">A more <span class="accent">transparent</span>, efficient, and connected reimbursement experience.</h2>
+      <p class="impact-sub">Adopted by new clients and embraced by existing ones — the redesign reshaped how reimbursement work moves across employees, managers, and finance teams.</p>
+      <div class="impact-grid stagger">
+        <div class="impact-item"><div class="impact-side"><div class="impact-num">01</div><div class="impact-icon"><i data-lucide="users"></i></div></div><div><div class="impact-h">Successful client rollout</div><div class="impact-d">Successfully rolled out the redesigned workflow to new clients, with existing clients gradually adopting the new experience.</div></div></div>
+        <div class="impact-item"><div class="impact-side"><div class="impact-num">02</div><div class="impact-icon"><i data-lucide="zap"></i></div></div><div><div class="impact-h">Reduced manual verification</div><div class="impact-d">A streamlined finance review and reimbursement flow cut down repetitive manual work for finance teams.</div></div></div>
+        <div class="impact-item"><div class="impact-side"><div class="impact-num">03</div><div class="impact-icon"><i data-lucide="trending-up"></i></div></div><div><div class="impact-h">Faster reimbursement processing</div><div class="impact-d">Better visibility into verified amounts, violations, and payment status made reimbursements move more quickly.</div></div></div>
+        <div class="impact-item"><div class="impact-side"><div class="impact-num">04</div><div class="impact-icon"><i data-lucide="workflow"></i></div></div><div><div class="impact-h">Centralized operational workflow</div><div class="impact-d">Verification, approval, and reimbursement actions were brought into a single structured workflow.</div></div></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<main>
+  <div class="container py-32">
+    <!-- 09 LEARNINGS -->
+    <section id="learnings" class="chapter reveal">
+      <div class="ghost">09</div>
+      <div class="chapter-inner">
+        <div class="eyebrow"><span class="eyebrow-dot"></span><span class="eyebrow-text">Chapter 09 — Reflection</span></div>
+        <h2 class="chapter-title">What I'm taking<br><span class="accent">forward</span>.</h2>
+        <p class="chapter-intro">Personal takeaways from designing across compliance-heavy, multi-stakeholder finance workflows.</p>
+        <div class="grid-2 stagger" style="margin-top:64px">
+          <div class="learn"><span class="learn-corner">L·01</span><div class="learn-box"><i data-lucide="shield-check"></i></div><div class="card-title">Designing complex finance workflows</div><div class="card-desc">Balancing compliance, usability, and operational efficiency without compromising on either side.</div></div>
+          <div class="learn"><span class="learn-corner">L·02</span><div class="learn-box"><i data-lucide="layers"></i></div><div class="card-title">Multi-level approvals at scale</div><div class="card-desc">Handling multi-level approval systems, reimbursement tracking, and policy-based validation.</div></div>
+          <div class="learn"><span class="learn-corner">L·03</span><div class="learn-box"><i data-lucide="messages-square"></i></div><div class="card-title">Partnering with stakeholders</div><div class="card-desc">Working closely with finance and support teams surfaced real bottlenecks and edge cases early.</div></div>
+          <div class="learn"><span class="learn-corner">L·04</span><div class="learn-box"><i data-lucide="check-circle-2"></i></div><div class="card-title">Iteration drove adoption</div><div class="card-desc">Continuous iteration and feedback-driven improvements were key to client adoption.</div></div>
+        </div>
+      </div>
+    </section>
+  </div>
+</main>
+
+<footer>
+  <div class="footer-blob"></div>
+  <div class="footer-inner">
+    <div class="container">
+      <div class="footer-end">End of case study · 09 / 09</div>
+      <h3 class="footer-title">Thanks for<br><span class="ital accent">reading.</span></h3>
+      <div class="footer-meta">
+        <p class="footer-text">Let's design something useful together. Have a project, conversation, or question in mind?</p>
+        <div class="footer-right">
+          <div class="footer-brand"><span class="brand-dot"></span><span>TripGain</span></div>
+          <span class="footer-sep">·</span><span>© 2026</span><span class="footer-sep">·</span><span>Senior Product Designer</span>
+        </div>
+      </div>
+    </div>
+  </div>
+</footer>
+
+<script>
+  lucide.createIcons();
+
+ const compare = document.querySelector('.compare');
+compare.querySelector('.slider').addEventListener('input', (e) => {
+  compare.style.setProperty('--position', `${e.target.value}%`);
+});
+  // progress
+  const progress = document.getElementById('progress');
+  window.addEventListener('scroll', () => {
+    const h = document.documentElement;
+    const p = (h.scrollTop) / (h.scrollHeight - h.clientHeight) * 100;
+    progress.style.width = p + '%';
+  });
+
+  // active nav
+  const navLinks = document.querySelectorAll('.nav-link[data-target]');
+  const sections = ['overview','role','workflow','problem','research','goals','solution'];
+  const navObs = new IntersectionObserver((entries) => {
+    entries.forEach(e => {
+      if (e.isIntersecting) {
+        navLinks.forEach(l => l.classList.toggle('active', l.dataset.target === e.target.id));
+      }
+    });
+  }, { rootMargin: '-40% 0px -55% 0px' });
+  sections.forEach(id => { const el = document.getElementById(id); if (el) navObs.observe(el); });
+
+  // reveal + stagger
+  const revealObs = new IntersectionObserver((entries) => {
+    entries.forEach(e => { if (e.isIntersecting) { e.target.classList.add('in'); revealObs.unobserve(e.target); } });
+  }, { rootMargin: '-60px' });
+  document.querySelectorAll('.reveal, .stagger').forEach(el => revealObs.observe(el));
+
+  // counters
+  const counterObs = new IntersectionObserver((entries) => {
+    entries.forEach(e => {
+      if (!e.isIntersecting) return;
+      const el = e.target;
+      const target = parseInt(el.dataset.counter, 10);
+      const start = performance.now();
+      const dur = 1400;
+      const tick = (now) => {
+        const t = Math.min(1, (now - start) / dur);
+        const eased = 1 - Math.pow(1 - t, 3);
+        const v = Math.round(target * eased);
+        el.textContent = String(v).padStart(2, '0');
+        if (t < 1) requestAnimationFrame(tick);
+      };
+      requestAnimationFrame(tick);
+      counterObs.unobserve(el);
+    });
+  }, { rootMargin: '-40px' });
+  document.querySelectorAll('[data-counter]').forEach(el => counterObs.observe(el));
+</script>
+</body>
+</html>
